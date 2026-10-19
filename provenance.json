@@ -1,0 +1,15 @@
+{
+  "package": "ayla-tools-web",
+  "origin": "maintained-fork",
+  "upstream": {
+    "name": "pi-web-access",
+    "repository": "https://github.com/nicobailon/pi-web-access",
+    "author": "Nico Bailon",
+    "license": "MIT",
+    "npmPackage": "pi-web-access"
+  },
+  "sourceRepository": "https://github.com/kekma-dot/ayla-tools-web",
+  "publicDistribution": "clean-curated-snapshot",
+  "family": "Ayla tools",
+  "notes": "This repository is NOT the original project. It is a maintained fork of pi-web-access by Nico Bailon (MIT), curated for standalone installation in Pi 1.3.0 without any personal Pi profile. Upstream copyright and license are retained in LICENSE. Local modifications add the web_document contract v1, bounded immutable snapshots, SSRF hardening, and profile-independent configuration."
+}
