@@ -354,3 +354,7 @@ npm run build            # пересборка dist; проверка восп�
 
 MIT. Копирайт upstream (c) 2025 **Nico Bailon**; изменения форка (c) 2026
 kekma-dot. См. [LICENSE](LICENSE).
+
+Standalone MCP-бандл включает TypeBox (MIT, Haydn Paterson); полный текст его
+лицензии поставляется в [THIRD-PARTY-NOTICES](THIRD-PARTY-NOTICES). Сохраняйте этот
+файл при распространении бандлов. Установленные зависимости сохраняют свои лицензии.

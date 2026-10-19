@@ -339,3 +339,7 @@ npm run build            # rebuild dist; verifies the committed bundle is reprod
 
 MIT. Upstream copyright (c) 2025 **Nico Bailon**; fork modifications
 (c) 2026 kekma-dot. See [LICENSE](LICENSE).
+
+The standalone MCP bundle includes TypeBox (MIT, Haydn Paterson); its full
+license is shipped in [THIRD-PARTY-NOTICES](THIRD-PARTY-NOTICES). Keep that file
+with redistributed bundles. Other installed dependencies retain their own licenses.

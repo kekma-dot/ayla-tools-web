@@ -22,6 +22,7 @@ test("packed installs keep typebox as a peer dependency (hosted by pi at runtime
 		assert.ok(packedFiles.includes("index.ts"));
 		assert.ok(packedFiles.includes("CHANGELOG.md"));
 		assert.ok(packedFiles.includes("SECURITY.md"));
+		assert.ok(packedFiles.includes("THIRD-PARTY-NOTICES"), "the bundled TypeBox license must ship with the MCP CLI");
 		assert.ok(!packedFiles.some((path) => path.startsWith("skills/")));
 		assert.ok(!packedFiles.some((path) => path.startsWith("test/")));
 		// Pi installs packages without peers and hosts typebox itself, so the package must not ship a private copy.
@@ -34,6 +35,9 @@ test("packed installs keep typebox as a peer dependency (hosted by pi at runtime
 		const installedManifest = packageRequire(`${packageName}/package.json`);
 		assert.equal(installedManifest.peerDependencies?.typebox, "*");
 		assert.equal(installedManifest.dependencies?.typebox, undefined);
+		const notices = await readFile(join(tempDir, "node_modules", packageName, "THIRD-PARTY-NOTICES"), "utf8");
+		assert.match(notices, /Copyright \(c\) 2017-2026 Haydn Paterson/);
+		assert.match(notices, /The MIT License \(MIT\)/);
 		assert.throws(() => packageRequire.resolve("typebox"), { code: "MODULE_NOT_FOUND" });
 	} finally {
 		await rm(tempDir, { recursive: true, force: true });
