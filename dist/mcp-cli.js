@@ -10939,7 +10939,8 @@ var package_default = {
     "LICENSE",
     "provenance.json",
     "CHANGELOG.md",
-    "SECURITY.md"
+    "SECURITY.md",
+    "THIRD-PARTY-NOTICES"
   ],
   bin: {
     "pi-web-access-mcp": "dist/mcp-cli.js"
