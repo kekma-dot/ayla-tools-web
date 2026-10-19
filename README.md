@@ -217,23 +217,25 @@ Guarantees:
 ## Curator and summaries
 
 `.curate` and `/curate` open a local curator page for reviewing results.
-`workflow: "summary-review"` prefills it, and `workflow: "auto-summary"`
-generates a summary without opening the page:
+`workflow: "summary-review"` prefills it. Use `workflow: "auto-summary"` to
+generate a summary without opening the curator:
 
 ```json
 { "queries": ["…"], "workflow": "auto-summary" }
 ```
 
 `summaryModel` picks the drafting model; without it the configured Pi summary
-model is used, and a slow or failed draft never blocks the results. Remote curator
-sessions print the URL instead of opening a browser, which is what Docker, WSL, SSH
-and headless hosts need.
+model is used, and a slow or failed draft never blocks the results.
+
+Remote curator sessions print the URL instead of trying to open a browser by default.
+In Docker, WSL, SSH, or headless environments, use the printed URL.
+Copy it into a browser that can reach the Pi host.
 
 ## Tools and commands
 
-Every tool and command can be switched off. `toolNames` maps a tool to another
-public name when it collides with another package. Registration changes need a Pi
-restart; `/reload` is not enough for renamed or disabled tools.
+Every tool and command can be switched off. `toolNames` can opt into alternate public tool names
+when a name collides with another package. Pi restart is required for tool and command registration changes;
+`/reload` is not enough for renamed or disabled tools.
 
 ```json
 {
