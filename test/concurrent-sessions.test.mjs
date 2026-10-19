@@ -1,15 +1,27 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { delimiter, join } from "node:path";
 import { after, afterEach, test } from "node:test";
 
-import initializeExtension from "../index.ts";
-import { clearResults, getResult } from "../storage.ts";
+// Snapshot bodies live only in the bounded disk store; without the switch the engine keeps the
+// body inline in memory instead, which would make the eviction assertions below meaningless.
+// The config must be in place before the extension module reads it, so the imports are dynamic.
+const agentDir = await mkdtemp(join(tmpdir(), "pi-web-access-concurrent-agent-"));
+process.env.PI_CODING_AGENT_DIR = agentDir;
+await writeFile(join(agentDir, "web-search.json"), JSON.stringify({ documentSnapshots: true }), "utf8");
+
+const { default: initializeExtension } = await import("../index.ts");
+const { clearResults, getAllResults, getFetchCacheDir, getResult } = await import("../storage.ts");
 
 const originalFetch = globalThis.fetch;
-after(() => { globalThis.fetch = originalFetch; });
+after(async () => {
+	globalThis.fetch = originalFetch;
+	delete process.env.PI_CODING_AGENT_DIR;
+	await rm(agentDir, { recursive: true, force: true });
+});
 
 // A host that serves several conversations at once (an app or chat server built on the SDK)
 // runs one extension instance per session, in one process. Each instance's session events
@@ -132,9 +144,21 @@ test("a session forked from history keeps the live session's snapshot reference 
 	assert.match(await retrieve(room, shared), /Live content/);
 	assert.match(await retrieve(thread, shared), /Live content/);
 
+	// The reference must point at a real file under the bounded store, and no copy of the body
+	// may exist in memory — otherwise removing the store could not prove anything.
+	const stored = getResult(shared);
+	const inMemory = getAllResults().find((result) => result.id === shared);
+	assert.equal(inMemory.snapshotVersion, 1);
+	assert.equal(inMemory.urls, undefined);
+	assert.ok(stored.fetchCache?.key);
+	const cacheDir = getFetchCacheDir();
+	assert.ok(existsSync(join(cacheDir, stored.fetchCache.key)));
+	assert.match(stored.fetchCache.key, /^snapshot-/);
+
 	// Once that store is pruned, neither session invents content: the same reference in
 	// both sessions reports the explicit eviction instead of failing as an unknown id.
-	await rm(join(cacheRoot, "web-search-cache"), { recursive: true, force: true });
+	await rm(cacheDir, { recursive: true, force: true });
+	assert.equal(existsSync(join(cacheDir, stored.fetchCache.key)), false);
 	const evicted = /evicted from bounded storage/;
 	assert.match(await retrieve(room, shared), evicted);
 	assert.match(await retrieve(thread, shared), evicted);
